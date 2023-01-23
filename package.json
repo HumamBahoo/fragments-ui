@@ -12,5 +12,8 @@
   },
   "keywords": [],
   "author": "Humam Bahoo hbahoo@myseneca.ca",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "prettier": "2.8.3"
+  }
 }
