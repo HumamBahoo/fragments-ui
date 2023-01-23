@@ -3,9 +3,12 @@
   "private": true,
   "version": "0.0.1",
   "description": "Fragments UI testing web app",
+  "source": "src/index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint --config .eslintrc.js src/**"
+    "lint": "eslint --config .eslintrc.js src/**",
+    "start": "parcel",
+    "build": "parcel build"
   },
   "repository": {
     "type": "git",
@@ -15,8 +18,15 @@
   "author": "Humam Bahoo hbahoo@myseneca.ca",
   "license": "ISC",
   "devDependencies": {
+    "buffer": "^5.7.1",
     "eslint": "^8.32.0",
     "parcel": "^2.8.3",
-    "prettier": "2.8.3"
+    "prettier": "2.8.3",
+    "process": "^0.11.10",
+    "punycode": "^1.4.1",
+    "querystring-es3": "^0.2.1"
+  },
+  "dependencies": {
+    "aws-amplify": "^5.0.11"
   }
 }
