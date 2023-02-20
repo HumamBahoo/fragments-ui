@@ -3,29 +3,43 @@
   "private": true,
   "version": "0.0.1",
   "description": "Fragments UI testing web app",
-  "source": "src/index.html",
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "web-vitals": "^2.1.4"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint --config .eslintrc.js src/**",
-    "start": "parcel",
-    "build": "parcel build"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/HumamBahoo/fragments-ui.git"
   },
-  "keywords": [],
-  "author": "Humam Bahoo hbahoo@myseneca.ca",
-  "license": "ISC",
-  "devDependencies": {
-    "buffer": "^5.7.1",
-    "parcel": "^2.8.3",
-    "prettier": "2.8.3",
-    "process": "^0.11.10",
-    "punycode": "^1.4.1",
-    "querystring-es3": "^0.2.1"
-  },
-  "dependencies": {
-    "aws-amplify": "^5.0.11"
-  }
+  "author": "Humam Bahoo",
+  "license": "UNLICENSED"
 }
