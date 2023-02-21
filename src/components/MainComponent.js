@@ -1,30 +1,30 @@
 import { useEffect, useState } from 'react';
 import { getUser } from '../auth';
 import LoginComponent from './LoginComponent';
+import { getUserFragments } from '../api';
 
 const MainComponent = () => {
-  const [user, setUser] = useState('');
+  const [userData, setUserData] = useState({});
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  useEffect(() => {
-    // function to get logged in user and set it
-    const getUserData = async () => {
-      const result = await getUser();
-      if (result) {
-        setUser(result.username);
-      }
-    };
+  const getUserData = async () => {
+    const res = await getUser();
 
-    // get user data
+    if (res) {
+      setUserData(res);
+      setIsLoggedIn(true);
+    }
+  };
+
+  useEffect(() => {
     getUserData();
 
-    // find if user is logged in
-    if (user) {
-      setIsLoggedIn(true);
-    } else {
-      setIsLoggedIn(false);
+    if (isLoggedIn) {
+      getUserFragments(userData);
     }
-  }, [user]);
+
+    // eslint-disable-next-line
+  }, [isLoggedIn]);
 
   return (
     <div className="MainComponent">
@@ -33,7 +33,7 @@ const MainComponent = () => {
       {/* display username if user is logged in */}
       {isLoggedIn === true && (
         <h2 className="text-3xl font-semibold text-white text-center mt-[50px]">
-          Hello <span className="text-red-400 uppercase">{user}!</span>
+          Hello <span className="text-red-400 uppercase">{userData.username}!</span>
         </h2>
       )}
     </div>
