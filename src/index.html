@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fragments UI</title>
+    <link rel="stylesheet" href="https://unpkg.com/bamboo.css" />
+    <link rel="stylesheet" href="styles.css" />
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <h1>Fragments UI</h1>
+
+    <section>
+      <nav><button id="login">Login</button> <button id="logout">Logout</button></nav>
+    </section>
+
+    <section hidden id="user">
+      <h2>Hello <span class="username"></span>!</h2>
+    </section>
+
+    <section>
+      <form id="new-fragment-form">
+        <h2>Create New Fragment</h2>
+
+        <textarea
+          name="text-fragment"
+          id="text-fragment"
+          cols="30"
+          rows="2"
+          placeholder="Insert any text here..."
+          required
+        ></textarea>
+
+        <button type="submit">Submit</button>
+      </form>
+    </section>
+
+    <section>
+      <form id="get-fragment-by-id-form">
+        <h2>Get Fragment by ID</h2>
+
+        <input
+          type="text"
+          name="fragment-id"
+          id="fragment-id"
+          placeholder="Enter fragment Id"
+          required
+        />
+
+        <button type="submit">Submit</button>
+      </form>
+    </section>
+  </body>
+</html>
