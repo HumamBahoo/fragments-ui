@@ -34,20 +34,20 @@ export async function listUserFragments(user) {
  * @param {*} user current authenticated user
  * @param {*} formData form data to submit
  */
-export async function postFragment(user, text) {
+export async function postFragment(user, content, fragmentType) {
   console.log('Creating a new fragment: Calling POST /v1/fragments');
 
   // setting fetch request details
-  const method = 'POST';
-  const body = text;
+  const body = content;
+
   const headers = {
     Authorization: user.authorizationHeaders().Authorization,
-    'Content-Type': 'text/plain',
+    'Content-Type': fragmentType,
   };
 
   try {
     const res = await fetch(`${apiUrl}/v1/fragments`, {
-      method: method,
+      method: 'POST',
       headers: headers,
       body: body,
     });
