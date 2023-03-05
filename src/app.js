@@ -8,8 +8,15 @@ async function init() {
   const userSection = document.querySelector('#user');
   const loginBtn = document.querySelector('#login');
   const logoutBtn = document.querySelector('#logout');
+
+  // Form: get fragment data by id
+  const getFragmentDataByIdForm = document.querySelector('#get-fragment-data-by-id-form');
+
+  // Form: create new fragment form
   const newFragmentForm = document.querySelector('#new-fragment-form');
-  const getFragmentDataByIdForm = document.querySelector('#get-fragment-by-id-form');
+  const fragmentTypeSelection = document.querySelector('#fragment-type');
+  const textFragmentInput = document.querySelector('#text-fragment');
+  const jsonFragmentInput = document.querySelector('#json-fragment');
 
   // Wire up event handlers to deal with login and logout.
   loginBtn.onclick = () => {
@@ -43,13 +50,53 @@ async function init() {
 
     // retrieve form data
     const formData = new FormData(newFragmentForm);
+    const selectedFragmentType = fragmentTypeSelection.value;
+
     const textFragment = formData.get('text-fragment');
+    const jsonFragment = formData.get('json-fragment');
 
-    // request
-    postFragment(user, textFragment);
+    // if plain text fragments
+    if (textFragment) {
+      // request to post
+      postFragment(user, textFragment, selectedFragmentType);
 
-    //clean up form
-    newFragmentForm.reset();
+      //clean up form
+      newFragmentForm.reset();
+      textFragmentInput.hidden = true;
+      textFragmentInput.required = false;
+    }
+
+    // if json fragments
+    if (jsonFragment) {
+      try {
+        // validate if this is a valid json fragment before submitting
+        JSON.parse(jsonFragment);
+
+        // request to post
+        postFragment(user, jsonFragment, selectedFragmentType);
+
+        //clean up form
+        newFragmentForm.reset();
+        jsonFragmentInput.hidden = true;
+        jsonFragmentInput.required = false;
+
+        // remove child node (notification) if it exists
+        const notificationElement = newFragmentForm.querySelector('.notification');
+        if (notificationElement) {
+          notificationElement.remove();
+        }
+      } catch (err) {
+        // setup form notification
+        const notification = document.createElement('div');
+        notification.classList.add('notification');
+        notification.textContent = 'Invalid JSON format';
+        notification.style.color = 'red';
+
+        // append and log to console
+        newFragmentForm.appendChild(notification);
+        console.error('Invalid JSON format');
+      }
+    }
   };
 
   // =============================================
@@ -71,6 +118,23 @@ async function init() {
 
   // =============================================
   // =============================================
+
+  fragmentTypeSelection.onchange = () => {
+    // set everything to default
+    textFragmentInput.hidden = true;
+    textFragmentInput.required = false;
+
+    jsonFragmentInput.hidden = true;
+    jsonFragmentInput.required = false;
+
+    if (fragmentTypeSelection.value == 'text/plain') {
+      textFragmentInput.hidden = false;
+      textFragmentInput.required = true;
+    } else if (fragmentTypeSelection.value == 'application/json') {
+      jsonFragmentInput.hidden = false;
+      jsonFragmentInput.required = true;
+    }
+  };
 
   // Log the user info for debugging purposes
   console.log({ user });
