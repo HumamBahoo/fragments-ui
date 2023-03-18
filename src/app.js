@@ -17,6 +17,7 @@ async function init() {
   const fragmentTypeSelection = document.querySelector('#fragment-type');
   const textFragmentInput = document.querySelector('#text-fragment');
   const jsonFragmentInput = document.querySelector('#json-fragment');
+  const markdownFragmentInput = document.querySelector('#markdown-fragment');
 
   // Wire up event handlers to deal with login and logout.
   loginBtn.onclick = () => {
@@ -47,16 +48,16 @@ async function init() {
   // POST /v1/fragments
   newFragmentForm.onsubmit = (evt) => {
     evt.preventDefault();
-
     // retrieve form data
     const formData = new FormData(newFragmentForm);
     const selectedFragmentType = fragmentTypeSelection.value;
 
     const textFragment = formData.get('text-fragment');
     const jsonFragment = formData.get('json-fragment');
+    const markdownFragment = formData.get('markdown-fragment');
 
     // if plain text fragments
-    if (textFragment) {
+    if (selectedFragmentType == 'text/plain') {
       // request to post
       postFragment(user, textFragment, selectedFragmentType);
 
@@ -66,8 +67,19 @@ async function init() {
       textFragmentInput.required = false;
     }
 
+    // if markdown
+    if (selectedFragmentType == 'text/markdown') {
+      // request to post
+      postFragment(user, markdownFragment, selectedFragmentType);
+
+      //clean up form
+      newFragmentForm.reset();
+      markdownFragmentInput.hidden = true;
+      markdownFragmentInput.required = false;
+    }
+
     // if json fragments
-    if (jsonFragment) {
+    if (selectedFragmentType == 'application/json') {
       try {
         // validate if this is a valid json fragment before submitting
         JSON.parse(jsonFragment);
@@ -127,16 +139,22 @@ async function init() {
     jsonFragmentInput.hidden = true;
     jsonFragmentInput.required = false;
 
+    markdownFragmentInput.hidden = true;
+    markdownFragmentInput.required = false;
+
     if (fragmentTypeSelection.value == 'text/plain') {
       textFragmentInput.hidden = false;
       textFragmentInput.required = true;
+    } else if (fragmentTypeSelection.value == 'text/markdown') {
+      markdownFragmentInput.hidden = false;
+      markdownFragmentInput.required = true;
     } else if (fragmentTypeSelection.value == 'application/json') {
       jsonFragmentInput.hidden = false;
       jsonFragmentInput.required = true;
     }
   };
 
-  // Log the user info for debugging purposes
+  // Log user info for debugging purposes
   console.log({ user });
 
   // Update the UI to welcome the user
