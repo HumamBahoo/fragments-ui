@@ -9,23 +9,29 @@ const apiUrl = process.env.API_URL || 'http://localhost:8080';
  * to have an `idToken` attached, so we can send that along with the request.
  */
 export async function listUserFragments(user) {
-  console.log('Retrieving all fragments for current user: Calling GET /v1/fragments');
+  console.log('GET /v1/fragments: Get all user fragments');
 
   try {
-    const res = await fetch(`${apiUrl}/v1/fragments`, {
+    const res = await fetch(`${apiUrl}/v1/fragments?expand=1`, {
       // Generate headers with the proper Authorization bearer token to pass
       headers: user.authorizationHeaders(),
     });
 
     if (!res.ok) {
-      throw new Error(`${res.status} ${res.statusText}`);
+      throw await res.json();
     }
 
     const data = await res.json();
-    console.log('Successfully retrieved all user fragments', { data });
-    // TODO: return something
+
+    if (data.fragments.length > 0) {
+      console.log(`Successfully retrieved ${data.fragments.length} fragment(s)`, {
+        fragments: data.fragments,
+      });
+    } else {
+      console.warn('User has no fragments');
+    }
   } catch (err) {
-    console.error('Unable to call GET /v1/fragments', { err });
+    console.error('Error in GET /v1/fragments:', err);
   }
 }
 
@@ -35,7 +41,7 @@ export async function listUserFragments(user) {
  * @param {*} formData form data to submit
  */
 export async function postFragment(user, content, fragmentType) {
-  console.log('Creating a new fragment: Calling POST /v1/fragments');
+  console.log('POST /v1/fragments: Create a new fragment');
 
   // setting fetch request details
   const body = content;
@@ -56,19 +62,10 @@ export async function postFragment(user, content, fragmentType) {
       throw await res.json();
     }
 
-    const data = {
-      status: res.status,
-      statusText: res.statusText,
-      'Content-Type': res.headers.get('Content-Type'),
-      Location: res.headers.get('Location'),
-      'Content-Length': res.headers.get('Content-Length'),
-      body: await res.json(),
-    };
-
-    console.log('Successfully created a new fragment', { data });
-    // TODO: return something
+    const data = await res.json();
+    console.log(`A New ${fragmentType} fragment was created`, { data });
   } catch (err) {
-    console.error('Failed to create a new fragment', { err });
+    console.error('Error in POST /v1/fragments', { err });
   }
 }
 
@@ -76,7 +73,7 @@ export async function postFragment(user, content, fragmentType) {
  *
  */
 export async function getFragmentDataById(user, fragmentId) {
-  console.log('Retrieving a fragment by Id: Calling GET /v1/fragments/:id');
+  console.log('GET /v1/fragments/:id: Get fragment by Id');
 
   try {
     const res = await fetch(`${apiUrl}/v1/fragments/${fragmentId}`, {
@@ -87,21 +84,25 @@ export async function getFragmentDataById(user, fragmentId) {
       throw await res.json();
     }
 
-    const data = {
-      status: res.status,
-      statusText: res.statusText,
-      'Content-Type': res.headers.get('Content-Type'),
-      'Content-Length': res.headers.get('Content-Length'),
-    };
+    // get data based on response content-type
+    let data;
+    const contentType = res.headers.get('Content-Type');
 
-    if (data['Content-Type'].match('text/*')) {
-      data['body'] = await res.text();
-    } else {
-      data['body'] = await res.json();
+    if (contentType.includes('text/plain')) {
+      data = await res.text();
+    }
+    if (contentType.includes('text/markdown')) {
+      data = await res.text();
+    }
+    if (contentType.includes('text/html')) {
+      data = await res.text();
+    }
+    if (contentType.includes('application/json')) {
+      data = await res.json();
     }
 
-    console.log('Successfully retrieved the fragment', { data });
+    console.log('Fragment data has been retrieved', { data });
   } catch (err) {
-    console.error('Failed to retrieve the fragment', { err });
+    console.error('Error in GET /v1/fragments/:id', err);
   }
 }

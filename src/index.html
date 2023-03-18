@@ -27,7 +27,8 @@
 
         <select name="fragment-type" id="fragment-type" required>
           <option value="">Select fragment type</option>
-          <option id="text-plain-option" value="text/plain">text/pain</option>
+          <option id="text-plain-option" value="text/plain">text/plain</option>
+          <option id="text-markdown-option" value="text/markdown">text/markdown</option>
           <option id="application-json-option" value="application/json">application/json</option>
         </select>
 
@@ -35,19 +36,42 @@
           name="text-fragment"
           id="text-fragment"
           cols="30"
-          rows="2"
-          placeholder="Insert any text here..."
+          rows="5"
+          placeholder="Insert your text here..."
           hidden
-        ></textarea>
+        >
+This is sample plain text fragment</textarea
+        >
 
         <textarea
           name="json-fragment"
           id="json-fragment"
           cols="30"
-          rows="2"
-          placeholder="Insert valid json data"
+          rows="5"
+          placeholder="Insert valid json data here..."
           hidden
-        ></textarea>
+        >
+{
+  "firstName": "Humam",
+  "lastName": "Bahoo",
+  "description": "This is sample json fragment"
+}
+        </textarea>
+
+        <textarea
+          name="markdown-fragment"
+          id="markdown-fragment"
+          cols="30"
+          rows="5"
+          placeholder="Insert your markdown text here..."
+          hidden
+        >
+# Markdown Fragment
+
+## Markdown
+
+This is sample markdown fragment
+        </textarea>
 
         <button class="submit-btn" type="submit">Submit</button>
       </form>
@@ -56,6 +80,18 @@
     <section>
       <form id="get-fragment-data-by-id-form">
         <h2>Get Fragment Data by ID</h2>
+
+        <p>
+          You can append the desired extension to which type you want your fragment to be converted
+          to. For example: <strong>.txt</strong>, <strong>.md</strong>, etc...
+        </p>
+
+        <p>Supported conversion types (for now):</p>
+        <ul>
+          <li>text/plain => text/plain (.txt)</li>
+          <li>text/markdown => text/html (.html)</li>
+          <li>application/json => text/plain (.txt)</li>
+        </ul>
 
         <input
           type="text"
