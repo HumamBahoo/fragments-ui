@@ -28,6 +28,7 @@
         <select name="fragment-type" id="fragment-type" required>
           <option value="">Select fragment type</option>
           <option id="text-plain-option" value="text/plain">text/plain</option>
+          <option id="text-html-option" value="text/html">text/html</option>
           <option id="text-markdown-option" value="text/markdown">text/markdown</option>
           <option id="application-json-option" value="application/json">application/json</option>
         </select>
@@ -36,33 +37,18 @@
           name="text-fragment"
           id="text-fragment"
           cols="30"
-          rows="5"
+          rows="7"
           placeholder="Insert your text here..."
           hidden
         >
-This is sample plain text fragment</textarea
-        >
-
-        <textarea
-          name="json-fragment"
-          id="json-fragment"
-          cols="30"
-          rows="5"
-          placeholder="Insert valid json data here..."
-          hidden
-        >
-{
-  "firstName": "Humam",
-  "lastName": "Bahoo",
-  "description": "This is sample json fragment"
-}
+This is a sample plain text fragment
         </textarea>
 
         <textarea
           name="markdown-fragment"
           id="markdown-fragment"
           cols="30"
-          rows="5"
+          rows="7"
           placeholder="Insert your markdown text here..."
           hidden
         >
@@ -70,7 +56,34 @@ This is sample plain text fragment</textarea
 
 ## Markdown
 
-This is sample markdown fragment
+This is a sample markdown fragment
+        </textarea>
+
+        <textarea
+          name="html-fragment"
+          id="html-fragment"
+          cols="30"
+          rows="7"
+          placeholder="Insert your text here..."
+          hidden
+        >
+<h1>HTML Fragment</h1>
+<p>This is a sample html fragment</p>
+        </textarea>
+
+        <textarea
+          name="json-fragment"
+          id="json-fragment"
+          cols="30"
+          rows="7"
+          placeholder="Insert valid json data here..."
+          hidden
+        >
+{
+  "firstName": "Humam",
+  "lastName": "Bahoo",
+  "description": "This is a sample json fragment"
+}
         </textarea>
 
         <button class="submit-btn" type="submit">Submit</button>
@@ -86,10 +99,11 @@ This is sample markdown fragment
           to. For example: <strong>.txt</strong>, <strong>.md</strong>, etc...
         </p>
 
-        <p>Supported conversion types (for now):</p>
+        <h3>Current Supported conversion types:</h3>
         <ul>
           <li>text/plain => text/plain (.txt)</li>
           <li>text/markdown => text/html (.html)</li>
+          <li>text/html => text/plain (.txt)</li>
           <li>application/json => text/plain (.txt)</li>
         </ul>
 
