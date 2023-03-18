@@ -8,6 +8,7 @@ async function init() {
   const userSection = document.querySelector('#user');
   const loginBtn = document.querySelector('#login');
   const logoutBtn = document.querySelector('#logout');
+  const contentSection = document.querySelector('#content');
 
   // Form: get fragment data by id
   const getFragmentDataByIdForm = document.querySelector('#get-fragment-data-by-id-form');
@@ -178,6 +179,7 @@ async function init() {
 
   // Update the UI to welcome the user
   userSection.hidden = false;
+  contentSection.hidden = false;
 
   // Show the user's username
   userSection.querySelector('.username').innerText = user.username;

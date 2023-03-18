@@ -21,102 +21,108 @@
       <h2>Hello <span class="username"></span>!</h2>
     </section>
 
-    <section>
-      <form id="new-fragment-form">
-        <h2>Create New Fragment</h2>
+    <section hidden id="content">
+      <div>
+        <form id="new-fragment-form">
+          <h2>Create New Fragment</h2>
 
-        <select name="fragment-type" id="fragment-type" required>
-          <option value="">Select fragment type</option>
-          <option id="text-plain-option" value="text/plain">text/plain</option>
-          <option id="text-html-option" value="text/html">text/html</option>
-          <option id="text-markdown-option" value="text/markdown">text/markdown</option>
-          <option id="application-json-option" value="application/json">application/json</option>
-        </select>
+          <select name="fragment-type" id="fragment-type" required>
+            <option value="">Select fragment type</option>
+            <option id="text-plain-option" value="text/plain">text/plain</option>
+            <option id="text-html-option" value="text/html">text/html</option>
+            <option id="text-markdown-option" value="text/markdown">text/markdown</option>
+            <option id="application-json-option" value="application/json">application/json</option>
+          </select>
 
-        <textarea
-          name="text-fragment"
-          id="text-fragment"
-          cols="30"
-          rows="7"
-          placeholder="Insert your text here..."
-          hidden
-        >
+          <textarea
+            name="text-fragment"
+            id="text-fragment"
+            cols="30"
+            rows="7"
+            placeholder="Insert your text here..."
+            hidden
+          >
 This is a sample plain text fragment
-        </textarea>
+        </textarea
+          >
 
-        <textarea
-          name="markdown-fragment"
-          id="markdown-fragment"
-          cols="30"
-          rows="7"
-          placeholder="Insert your markdown text here..."
-          hidden
-        >
+          <textarea
+            name="markdown-fragment"
+            id="markdown-fragment"
+            cols="30"
+            rows="7"
+            placeholder="Insert your markdown text here..."
+            hidden
+          >
 # Markdown Fragment
 
 ## Markdown
 
 This is a sample markdown fragment
-        </textarea>
+        </textarea
+          >
 
-        <textarea
-          name="html-fragment"
-          id="html-fragment"
-          cols="30"
-          rows="7"
-          placeholder="Insert your text here..."
-          hidden
-        >
+          <textarea
+            name="html-fragment"
+            id="html-fragment"
+            cols="30"
+            rows="7"
+            placeholder="Insert your text here..."
+            hidden
+          >
 <h1>HTML Fragment</h1>
 <p>This is a sample html fragment</p>
-        </textarea>
+        </textarea
+          >
 
-        <textarea
-          name="json-fragment"
-          id="json-fragment"
-          cols="30"
-          rows="7"
-          placeholder="Insert valid json data here..."
-          hidden
-        >
+          <textarea
+            name="json-fragment"
+            id="json-fragment"
+            cols="30"
+            rows="7"
+            placeholder="Insert valid json data here..."
+            hidden
+          >
 {
   "firstName": "Humam",
   "lastName": "Bahoo",
   "description": "This is a sample json fragment"
 }
-        </textarea>
+        </textarea
+          >
 
-        <button class="submit-btn" type="submit">Submit</button>
-      </form>
-    </section>
+          <button class="submit-btn" type="submit">Submit</button>
+        </form>
+      </div>
 
-    <section>
-      <form id="get-fragment-data-by-id-form">
-        <h2>Get Fragment Data by ID</h2>
+      <div>
+        <form id="get-fragment-data-by-id-form">
+          <h2>Get Fragment Data by ID</h2>
 
-        <p>
-          You can append the desired extension to which type you want your fragment to be converted
-          to. For example: <strong>.txt</strong>, <strong>.md</strong>, etc...
-        </p>
+          <p>
+            You can append the desired extension to which type you want your fragment to be
+            converted to. For example: <strong>.txt</strong>, <strong>.md</strong>, etc...
+          </p>
 
-        <h3>Current Supported conversion types:</h3>
-        <ul>
-          <li>text/plain => text/plain (.txt)</li>
-          <li>text/markdown => text/html (.html)</li>
-          <li>text/html => text/plain (.txt)</li>
-          <li>application/json => text/plain (.txt)</li>
-        </ul>
+          <h3>Current Supported conversion types:</h3>
+          <ul>
+            <li>text/plain => text/plain (.txt)</li>
+            <li>text/markdown => text/html (.html)</li>
+            <li>text/html => text/plain (.txt)</li>
+            <li>application/json => text/plain (.txt)</li>
+          </ul>
 
-        <input
-          type="text"
-          name="fragment-id"
-          id="fragment-id"
-          placeholder="Enter fragment Id"
-          required
-        />
+          <input
+            type="text"
+            name="fragment-id"
+            id="fragment-id"
+            placeholder="Enter fragment Id"
+            required
+          />
 
-        <button class="submit-btn" type="submit">Submit</button>
-      </form>
+          <button class="submit-btn" type="submit">Submit</button>
+        </form>
+      </div>
     </section>
   </body>
 </html>
