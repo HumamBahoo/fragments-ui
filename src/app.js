@@ -18,6 +18,7 @@ async function init() {
   const textFragmentInput = document.querySelector('#text-fragment');
   const jsonFragmentInput = document.querySelector('#json-fragment');
   const markdownFragmentInput = document.querySelector('#markdown-fragment');
+  const htmlFragmentInput = document.querySelector('#html-fragment');
 
   // Wire up event handlers to deal with login and logout.
   loginBtn.onclick = () => {
@@ -53,8 +54,9 @@ async function init() {
     const selectedFragmentType = fragmentTypeSelection.value;
 
     const textFragment = formData.get('text-fragment');
-    const jsonFragment = formData.get('json-fragment');
+    const htmlFragment = formData.get('html-fragment');
     const markdownFragment = formData.get('markdown-fragment');
+    const jsonFragment = formData.get('json-fragment');
 
     // if plain text fragments
     if (selectedFragmentType == 'text/plain') {
@@ -78,7 +80,18 @@ async function init() {
       markdownFragmentInput.required = false;
     }
 
-    // if json fragments
+    // if html
+    if (selectedFragmentType == 'text/html') {
+      // request to post
+      postFragment(user, htmlFragment, selectedFragmentType);
+
+      //clean up form
+      newFragmentForm.reset();
+      htmlFragmentInput.hidden = true;
+      htmlFragmentInput.required = false;
+    }
+
+    // if json
     if (selectedFragmentType == 'application/json') {
       try {
         // validate if this is a valid json fragment before submitting
@@ -136,11 +149,14 @@ async function init() {
     textFragmentInput.hidden = true;
     textFragmentInput.required = false;
 
-    jsonFragmentInput.hidden = true;
-    jsonFragmentInput.required = false;
+    htmlFragmentInput.hidden = true;
+    htmlFragmentInput.required = false;
 
     markdownFragmentInput.hidden = true;
     markdownFragmentInput.required = false;
+
+    jsonFragmentInput.hidden = true;
+    jsonFragmentInput.required = false;
 
     if (fragmentTypeSelection.value == 'text/plain') {
       textFragmentInput.hidden = false;
@@ -148,6 +164,9 @@ async function init() {
     } else if (fragmentTypeSelection.value == 'text/markdown') {
       markdownFragmentInput.hidden = false;
       markdownFragmentInput.required = true;
+    } else if (fragmentTypeSelection.value == 'text/html') {
+      htmlFragmentInput.hidden = false;
+      htmlFragmentInput.required = true;
     } else if (fragmentTypeSelection.value == 'application/json') {
       jsonFragmentInput.hidden = false;
       jsonFragmentInput.required = true;
