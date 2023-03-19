@@ -22,13 +22,6 @@ ARG AWS_COGNITO_HOSTED_UI_DOMAIN
 ARG OAUTH_SIGN_IN_REDIRECT_URL
 ARG OAUTH_SIGN_OUT_REDIRECT_URL
 
-# set env variables
-ENV AWS_COGNITO_POOL_ID=$AWS_COGNITO_POOL_ID
-ENV AWS_COGNITO_CLIENT_ID=$AWS_COGNITO_CLIENT_ID
-ENV AWS_COGNITO_HOSTED_UI_DOMAIN=$AWS_COGNITO_HOSTED_UI_DOMAIN
-ENV OAUTH_SIGN_IN_REDIRECT_URL=$OAUTH_SIGN_IN_REDIRECT_URL
-ENV OAUTH_SIGN_OUT_REDIRECT_URL=$OAUTH_SIGN_OUT_REDIRECT_URL
-
 # define work directory for our app
 WORKDIR /fragments-ui
 
@@ -37,9 +30,6 @@ COPY --from=dependencies /fragments-ui /fragments-ui/
 
 # copy our source code into our image
 COPY ./src/ /fragments-ui/src/
-
-# install parcel
-RUN npm install parcel@2.8.3
 
 # build site
 RUN npm run build
