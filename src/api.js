@@ -4,9 +4,7 @@
 const apiUrl = process.env.API_URL || 'http://localhost:8080';
 
 /**
- * Given an authenticated user, request all fragments for this user from the
- * fragments microservice (currently only running locally). We expect a user
- * to have an `idToken` attached, so we can send that along with the request.
+ * GET /v1/fragments?expand=1
  */
 export async function listFragments(user) {
   console.log('GET /v1/fragments?expand=1');
@@ -37,9 +35,7 @@ export async function listFragments(user) {
 }
 
 /**
- * Creating a new fragment for the current user
- * @param {*} user current authenticated user
- * @param {*} formData form data to submit
+ * POST /v1/fragments
  */
 export async function postFragment(user, content, fragmentType) {
   console.log('POST /v1/fragments');
@@ -68,7 +64,7 @@ export async function postFragment(user, content, fragmentType) {
 }
 
 /**
- *
+ * GET /v1/fragments/:id
  */
 export async function viewFragment(user, fragmentId) {
   console.log('GET /v1/fragments/:id');
@@ -104,6 +100,40 @@ export async function viewFragment(user, fragmentId) {
   }
 }
 
+/**
+ * PUT /v1/fragments/:id
+ */
+export async function updateFragment(user, content, fragmentId, fragmentType) {
+  console.log('PUT /v1/fragments');
+
+  try {
+    const res = await fetch(`${apiUrl}/v1/fragments/${fragmentId}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: user.authorizationHeaders().Authorization,
+        'Content-Type': fragmentType,
+      },
+      body: content,
+    });
+
+    if (!res.ok) {
+      throw await res.json();
+    }
+
+    const data = await res.json();
+
+    console.log('Success in updating fragment data: ', { data });
+
+    return data;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
+
+/**
+ * DELETE /v1/fragments/:id
+ */
 export async function deleteFragment(user, id) {
   console.log('DELETE /v1/fragments');
 

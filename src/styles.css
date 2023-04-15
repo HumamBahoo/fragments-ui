@@ -21,6 +21,8 @@ h3 {
   color: black;
   font-weight: bolder;
   align-self: flex-start;
+  margin-top: 10px;
+  min-width: 80px;
 }
 
 #user > h2 {

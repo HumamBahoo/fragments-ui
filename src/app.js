@@ -1,14 +1,63 @@
 // src/app.js
 
 import { Auth, getUser } from './auth';
-import { viewFragment, listFragments, deleteFragment, postFragment } from './api';
+import { viewFragment, listFragments, deleteFragment, postFragment, updateFragment } from './api';
 
 async function handleDeleteFragment(user, id) {
   await deleteFragment(user, id);
   await handleListFragments(user);
 }
 
-async function handleViewFragment(user, id) {}
+async function handleViewFragment(user, id) {
+  try {
+    const { data, fragmentType } = await viewFragment(user, id);
+
+    displayFragmentContent({ content: data, type: fragmentType, id: id });
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+function displayFragmentContent(fragment) {
+  const fragmentViewContent = document.getElementById('fragment-view-content');
+  const updateImageInput = document.getElementById('update-image-fragment');
+
+  // Clear any existing content
+  fragmentViewContent.innerHTML = '';
+
+  if (fragment.type.startsWith('image/')) {
+    const img = document.createElement('img');
+
+    img.src = fragment.content;
+    img.id = fragment.id;
+    img.className = 'fragment-content';
+    img.style.marginBottom = '10px';
+    img.setAttribute('data-fragment-type', fragment.type);
+
+    fragmentViewContent.appendChild(img);
+
+    // Show the file input for image update
+    updateImageInput.hidden = false;
+  } else {
+    const textArea = document.createElement('textarea');
+
+    textArea.id = fragment.id;
+    textArea.className = 'fragment-content';
+    textArea.style.marginBottom = '10px';
+    textArea.setAttribute('data-fragment-type', fragment.type);
+
+    if (fragment.type.startsWith('text/')) {
+      textArea.textContent = fragment.content;
+    } else {
+      textArea.textContent = JSON.stringify(fragment.content, null, 2);
+    }
+
+    fragmentViewContent.appendChild(textArea);
+
+    // Hide the file input for non-image fragments
+    updateImageInput.hidden = true;
+  }
+}
 
 async function handlePostFragment(user, formData) {
   const selectedFragmentType = formData.get('fragment-type-select');
@@ -80,6 +129,11 @@ async function handleListFragments(user) {
         const ownerId = fragment[column];
         cell.textContent = ownerId.substring(0, 5) + '***' + ownerId.substring(ownerId.length - 5);
       }
+      // if curr column is 'ownerId'
+      else if (column === 'created' || column === 'updated') {
+        const date = new Date(fragment[column]).toLocaleString();
+        cell.textContent = date;
+      }
       // everything else
       else {
         cell.textContent = fragment[column];
@@ -91,6 +145,8 @@ async function handleListFragments(user) {
     // create delete button and add an event listener
     const deleteButton = document.createElement('button');
     deleteButton.textContent = 'Delete';
+    deleteButton.style.backgroundColor = 'orange';
+    deleteButton.style.color = 'black';
     deleteButton.id = 'delete-fragment';
     deleteButton.onclick = async () => await handleDeleteFragment(user, fragment.id);
 
@@ -113,7 +169,9 @@ async function init() {
   const viewFragmentForm = document.querySelector('#view-fragment-form');
   const createFragmentForm = document.querySelector('#create-fragment-form');
   const createFragmentError = document.querySelector('#create-fragment-error');
+  const updateFragmentError = document.querySelector('#update-fragment-error');
   const getFragmentError = document.querySelector('#get-fragment-error');
+  const updateBtn = document.querySelector('#update-btn');
 
   // wire up event handlers to deal with login and logout.
   loginBtn.onclick = () => Auth.federatedSignIn();
@@ -142,7 +200,7 @@ async function init() {
   const jsonFragment = document.querySelector('#json-fragment');
   const imageFragment = document.querySelector('#image-fragment');
 
-  // handle change
+  // handling changes in the dom
   fragmentTypeSelect.onchange = () => {
     // set everything to default
     textFragment.hidden = true;
@@ -205,7 +263,7 @@ async function init() {
   viewFragmentForm.onsubmit = async (evt) => {
     evt.preventDefault();
 
-    // retrieve form data
+    // Retrieve form data
     const formData = new FormData(viewFragmentForm);
     const fragmentId = formData.get('fragment-id');
 
@@ -214,22 +272,9 @@ async function init() {
       getFragmentError.hidden = true;
     }
 
-    // handle view fragment
+    // Handle view fragment
     try {
-      const { data, fragmentType } = await viewFragment(user, fragmentId);
-
-      const pre = document.createElement('pre');
-
-      if (fragmentType.startsWith('image/')) {
-        const img = document.createElement('img');
-        img.src = data;
-        pre.appendChild(img);
-      } else {
-        pre.textContent = fragmentType.startsWith('text/') ? data : JSON.stringify(data, null, 2);
-      }
-
-      document.body.appendChild(pre);
-
+      await handleViewFragment(user, fragmentId);
       viewFragmentForm.reset();
     } catch (err) {
       const p = document.createElement('p');
@@ -237,6 +282,59 @@ async function init() {
       p.style.color = 'red';
       getFragmentError.appendChild(p);
       getFragmentError.hidden = false;
+    }
+  };
+
+  /////// handles UPDATE /v1/fragments/:id //////////////////
+  updateBtn.onclick = async (evt) => {
+    evt.preventDefault();
+    const fragmentContent = document.querySelector('.fragment-content');
+    const elementType = fragmentContent.tagName;
+    const fragmentId = fragmentContent.id.split('.')[0];
+
+    if (updateFragmentError) {
+      // remove existing error notification
+      updateFragmentError.innerHTML = '';
+      updateFragmentError.hidden = true;
+    }
+
+    // if image based
+    if (elementType.toLowerCase() == 'img') {
+      const updateImageFragment = document.querySelector('#update-image-fragment');
+
+      try {
+        const res = await updateFragment(
+          user,
+          updateImageFragment.files[0],
+          fragmentId,
+          updateImageFragment.files[0].type
+        );
+        console.log(res);
+
+        updateImageFragment.value = '';
+      } catch (err) {
+        const p = document.createElement('p');
+        p.textContent = err.error.message;
+        p.style.color = 'red';
+        updateFragmentError.appendChild(p);
+        updateFragmentError.hidden = false;
+      }
+    }
+    // if text based
+    else {
+      const fragmentCurrContent = fragmentContent.value;
+      const fragmentType = fragmentContent.getAttribute('data-fragment-type');
+
+      try {
+        const res = await updateFragment(user, fragmentCurrContent, fragmentId, fragmentType);
+        console.log(res);
+      } catch (err) {
+        const p = document.createElement('p');
+        p.textContent = err.error.message;
+        p.style.color = 'red';
+        updateFragmentError.appendChild(p);
+        updateFragmentError.hidden = false;
+      }
     }
   };
 }

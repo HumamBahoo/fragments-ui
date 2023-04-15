@@ -68,7 +68,7 @@
         </form>
 
         <form id="view-fragment-form">
-          <h2>Get Fragment Data by ID</h2>
+          <h2>Get/Convert and Display Fragment by ID</h2>
 
           <input
             type="text"
@@ -107,17 +107,22 @@
           <div>
             <h2>Fragment View</h2>
             <div id="fragment-view-content">
-              <textarea
-                name=""
-                id=""
-                cols="30"
-                rows="10"
-                placeholder="placeholder"
-                disabled
-              ></textarea>
+              <pre></pre>
             </div>
+
+            <input
+              type="file"
+              id="update-image-fragment"
+              class="fragment-content"
+              hidden
+              style="margin-bottom: 10px"
+              accept="image/*"
+            />
+
+            <div id="update-fragment-error" hidden></div>
+
+            <button id="update-btn" class="submit-btn">Update</button>
           </div>
-          <button class="submit-btn">Update</button>
         </div>
       </div>
     </section>
