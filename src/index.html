@@ -6,12 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fragments UI</title>
     <link rel="stylesheet" href="https://unpkg.com/bamboo.css" />
-
     <link rel="stylesheet" href="styles.css" />
     <script type="module" src="app.js"></script>
   </head>
   <body>
-    <h1>Fragments UI</h1>
+    <h1>Fragments UI test</h1>
 
     <section>
       <nav><button id="login">Login</button> <button id="logout">Logout</button></nav>
@@ -22,106 +21,104 @@
     </section>
 
     <section hidden id="content">
-      <div>
-        <form id="new-fragment-form">
+      <div id="forms-container">
+        <form id="create-fragment-form">
           <h2>Create New Fragment</h2>
 
-          <select name="fragment-type" id="fragment-type" required>
+          <select
+            title="fragment-type-select"
+            name="fragment-type-select"
+            id="fragment-type-select"
+            required
+          >
             <option value="">Select fragment type</option>
             <option id="text-plain-option" value="text/plain">text/plain</option>
             <option id="text-html-option" value="text/html">text/html</option>
             <option id="text-markdown-option" value="text/markdown">text/markdown</option>
             <option id="application-json-option" value="application/json">application/json</option>
+            <option id="image-png-option" value="image/png">image/png</option>
+            <option id="image-jpg-option" value="image/jpeg">image/jpeg</option>
+            <option id="image-webp-option" value="image/webp">image/webp</option>
+            <option id="image-gif-option" value="image/gif">image/gif</option>
           </select>
 
           <textarea
             name="text-fragment"
             id="text-fragment"
             cols="30"
-            rows="7"
-            placeholder="Insert your text here..."
+            rows="4"
+            placeholder="Insert your fragment data here..."
             hidden
-          >
-This is a sample plain text fragment
-        </textarea
-          >
-
-          <textarea
-            name="markdown-fragment"
-            id="markdown-fragment"
-            cols="30"
-            rows="7"
-            placeholder="Insert your markdown text here..."
-            hidden
-          >
-# Markdown Fragment
-
-## Markdown
-
-This is a sample markdown fragment
-        </textarea
-          >
-
-          <textarea
-            name="html-fragment"
-            id="html-fragment"
-            cols="30"
-            rows="7"
-            placeholder="Insert your text here..."
-            hidden
-          >
-<h1>HTML Fragment</h1>
-<p>This is a sample html fragment</p>
-        </textarea
-          >
+          ></textarea>
 
           <textarea
             name="json-fragment"
             id="json-fragment"
             cols="30"
-            rows="7"
+            rows="4"
             placeholder="Insert valid json data here..."
             hidden
-          >
-{
-  "firstName": "Humam",
-  "lastName": "Bahoo",
-  "description": "This is a sample json fragment"
-}
-        </textarea
-          >
+          ></textarea>
+
+          <input type="file" id="image-fragment" accept="image/*" hidden />
+
+          <div id="create-fragment-error" hidden></div>
 
           <button class="submit-btn" type="submit">Submit</button>
         </form>
-      </div>
 
-      <div>
-        <form id="get-fragment-data-by-id-form">
+        <form id="view-fragment-form">
           <h2>Get Fragment Data by ID</h2>
-
-          <p>
-            You can append the desired extension to which type you want your fragment to be
-            converted to. For example: <strong>.txt</strong>, <strong>.md</strong>, etc...
-          </p>
-
-          <h3>Current Supported conversion types:</h3>
-          <ul>
-            <li>text/plain => text/plain (.txt)</li>
-            <li>text/markdown => text/html (.html)</li>
-            <li>text/html => text/plain (.txt)</li>
-            <li>application/json => text/plain (.txt)</li>
-          </ul>
 
           <input
             type="text"
             name="fragment-id"
             id="fragment-id"
-            placeholder="Enter fragment Id"
+            placeholder="Enter fragment Id (Optional: add conversion extension 'id.txt, id.png')"
             required
           />
 
-          <button class="submit-btn" type="submit">Submit</button>
+          <button class="submit-btn" type="submit">View</button>
+
+          <div id="get-fragment-error" hidden></div>
         </form>
+      </div>
+
+      <div id="views-container">
+        <div id="user-fragments-table">
+          <h2>User Fragments</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Owner ID</th>
+                <th>Type</th>
+                <th>Size</th>
+                <th>Created</th>
+                <th>Updated</th>
+                <th>Delete</th>
+              </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+          </table>
+        </div>
+
+        <div id="fragment-view-container">
+          <div>
+            <h2>Fragment View</h2>
+            <div id="fragment-view-content">
+              <textarea
+                name=""
+                id=""
+                cols="30"
+                rows="10"
+                placeholder="placeholder"
+                disabled
+              ></textarea>
+            </div>
+          </div>
+          <button class="submit-btn">Update</button>
+        </div>
       </div>
     </section>
   </body>

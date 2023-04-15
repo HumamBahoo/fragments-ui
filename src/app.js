@@ -1,194 +1,244 @@
 // src/app.js
 
 import { Auth, getUser } from './auth';
-import { getFragmentDataById, listUserFragments, postFragment } from './api';
+import { viewFragment, listFragments, deleteFragment, postFragment } from './api';
+
+async function handleDeleteFragment(user, id) {
+  await deleteFragment(user, id);
+  await handleListFragments(user);
+}
+
+async function handleViewFragment(user, id) {}
+
+async function handlePostFragment(user, formData) {
+  const selectedFragmentType = formData.get('fragment-type-select');
+  const textFragment = formData.get('text-fragment');
+  const jsonFragment = formData.get('json-fragment');
+  const imageFragment = document.querySelector('#image-fragment');
+
+  if (selectedFragmentType.startsWith('text/')) {
+    try {
+      const res = await postFragment(user, textFragment, selectedFragmentType);
+      return res;
+    } catch (err) {
+      console.error(err);
+      return 'Failed to create a new fragment';
+    }
+  }
+
+  if (selectedFragmentType.startsWith('application/')) {
+    try {
+      JSON.parse(jsonFragment);
+      const res = await postFragment(user, jsonFragment, selectedFragmentType);
+      return res;
+    } catch (err) {
+      console.error(err);
+      return 'Failed to create a new fragment';
+    }
+  }
+
+  if (selectedFragmentType.startsWith('image/')) {
+    try {
+      const res = await postFragment(user, imageFragment.files[0], imageFragment.files[0].type);
+      return res;
+    } catch (err) {
+      console.error(err);
+      return 'Failed to create a new fragment';
+    }
+  }
+}
+
+async function handleListFragments(user) {
+  const res = await listFragments(user);
+
+  const tableBody = document.querySelector('#table-body');
+  tableBody.innerHTML = '';
+
+  // loop through the fragments array
+  res.fragments.forEach((fragment) => {
+    const columns = ['id', 'ownerId', 'type', 'size', 'created', 'updated'];
+    const tr = document.createElement('tr');
+
+    // loop through each column to append the fragment data
+    columns.forEach((column) => {
+      const cell = document.createElement('td');
+
+      // if curr column is 'id'
+      if (column === 'id') {
+        // create a link and set its properties
+        const idLink = document.createElement('a');
+        idLink.href = '#';
+        idLink.textContent = fragment[column];
+        idLink.onclick = async () => await handleViewFragment(user, fragment.id);
+
+        // append link to cell
+        cell.appendChild(idLink);
+      }
+      // if curr column is 'ownerId'
+      else if (column === 'ownerId') {
+        // display the first and last 5 characters
+        const ownerId = fragment[column];
+        cell.textContent = ownerId.substring(0, 5) + '***' + ownerId.substring(ownerId.length - 5);
+      }
+      // everything else
+      else {
+        cell.textContent = fragment[column];
+      }
+
+      tr.appendChild(cell);
+    });
+
+    // create delete button and add an event listener
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = 'Delete';
+    deleteButton.id = 'delete-fragment';
+    deleteButton.onclick = async () => await handleDeleteFragment(user, fragment.id);
+
+    // add delete button to the row
+    const buttonCell = document.createElement('td');
+    buttonCell.appendChild(deleteButton);
+    tr.appendChild(buttonCell);
+
+    // append tr to tbody
+    tableBody.appendChild(tr);
+  });
+}
 
 async function init() {
-  // Get our UI elements
+  // get our UI elements
   const userSection = document.querySelector('#user');
   const loginBtn = document.querySelector('#login');
   const logoutBtn = document.querySelector('#logout');
   const contentSection = document.querySelector('#content');
+  const viewFragmentForm = document.querySelector('#view-fragment-form');
+  const createFragmentForm = document.querySelector('#create-fragment-form');
+  const createFragmentError = document.querySelector('#create-fragment-error');
+  const getFragmentError = document.querySelector('#get-fragment-error');
 
-  // Form: get fragment data by id
-  const getFragmentDataByIdForm = document.querySelector('#get-fragment-data-by-id-form');
+  // wire up event handlers to deal with login and logout.
+  loginBtn.onclick = () => Auth.federatedSignIn();
+  logoutBtn.onclick = () => Auth.signOut();
 
-  // Form: create new fragment form
-  const newFragmentForm = document.querySelector('#new-fragment-form');
-  const fragmentTypeSelection = document.querySelector('#fragment-type');
-  const textFragmentInput = document.querySelector('#text-fragment');
-  const jsonFragmentInput = document.querySelector('#json-fragment');
-  const markdownFragmentInput = document.querySelector('#markdown-fragment');
-  const htmlFragmentInput = document.querySelector('#html-fragment');
-
-  // Wire up event handlers to deal with login and logout.
-  loginBtn.onclick = () => {
-    // Sign-in via the Amazon Cognito Hosted UI (requires redirects), see:
-    // https://docs.amplify.aws/lib/auth/advanced/q/platform/js/#identity-pool-federation
-    Auth.federatedSignIn();
-  };
-
-  logoutBtn.onclick = () => {
-    // Sign-out of the Amazon Cognito Hosted UI (requires redirects), see:
-    // https://docs.amplify.aws/lib/auth/emailpassword/q/platform/js/#sign-out
-    Auth.signOut();
-  };
-
-  // See if we're signed in (i.e., we'll have a `user` object)
+  // get the signed in user
   const user = await getUser();
 
-  if (!user) {
-    // Disable the Logout button
+  // if user is signed in
+  if (user) {
+    console.log({ user });
+    userSection.querySelector('.username').textContent = user.username;
+    userSection.hidden = false;
+    contentSection.hidden = false;
+    loginBtn.disabled = true;
+    handleListFragments(user);
+  }
+  // if user not signed in
+  else {
     logoutBtn.disabled = true;
-    return;
   }
 
-  // EVENT HANDLERS
-  // =============================================
-  // =============================================
+  /////// handles fragment type selection //////////////////
+  const fragmentTypeSelect = document.querySelector('#fragment-type-select');
+  const textFragment = document.querySelector('#text-fragment');
+  const jsonFragment = document.querySelector('#json-fragment');
+  const imageFragment = document.querySelector('#image-fragment');
 
-  // POST /v1/fragments
-  newFragmentForm.onsubmit = (evt) => {
-    evt.preventDefault();
-    // retrieve form data
-    const formData = new FormData(newFragmentForm);
-    const selectedFragmentType = fragmentTypeSelection.value;
+  // handle change
+  fragmentTypeSelect.onchange = () => {
+    // set everything to default
+    textFragment.hidden = true;
+    textFragment.required = false;
+    jsonFragment.hidden = true;
+    jsonFragment.required = false;
+    imageFragment.hidden = true;
+    imageFragment.required = false;
 
-    const textFragment = formData.get('text-fragment');
-    const htmlFragment = formData.get('html-fragment');
-    const markdownFragment = formData.get('markdown-fragment');
-    const jsonFragment = formData.get('json-fragment');
-
-    // if plain text fragments
-    if (selectedFragmentType == 'text/plain') {
-      // request to post
-      postFragment(user, textFragment, selectedFragmentType);
-
-      //clean up form
-      newFragmentForm.reset();
-      textFragmentInput.hidden = true;
-      textFragmentInput.required = false;
-    }
-
-    // if markdown
-    if (selectedFragmentType == 'text/markdown') {
-      // request to post
-      postFragment(user, markdownFragment, selectedFragmentType);
-
-      //clean up form
-      newFragmentForm.reset();
-      markdownFragmentInput.hidden = true;
-      markdownFragmentInput.required = false;
-    }
-
-    // if html
-    if (selectedFragmentType == 'text/html') {
-      // request to post
-      postFragment(user, htmlFragment, selectedFragmentType);
-
-      //clean up form
-      newFragmentForm.reset();
-      htmlFragmentInput.hidden = true;
-      htmlFragmentInput.required = false;
-    }
-
-    // if json
-    if (selectedFragmentType == 'application/json') {
-      try {
-        // validate if this is a valid json fragment before submitting
-        JSON.parse(jsonFragment);
-
-        // request to post
-        postFragment(user, jsonFragment, selectedFragmentType);
-
-        //clean up form
-        newFragmentForm.reset();
-        jsonFragmentInput.hidden = true;
-        jsonFragmentInput.required = false;
-
-        // remove child node (notification) if it exists
-        const notificationElement = newFragmentForm.querySelector('.notification');
-        if (notificationElement) {
-          notificationElement.remove();
-        }
-      } catch (err) {
-        // setup form notification
-        const notification = document.createElement('div');
-        notification.classList.add('notification');
-        notification.textContent = 'Invalid JSON format';
-        notification.style.color = 'red';
-
-        // append and log to console
-        newFragmentForm.appendChild(notification);
-        console.error('Invalid JSON format');
-      }
+    if (fragmentTypeSelect.value.startsWith('text/')) {
+      textFragment.hidden = false;
+      textFragment.required = true;
+    } else if (fragmentTypeSelect.value.startsWith('application/')) {
+      jsonFragment.hidden = false;
+      jsonFragment.required = true;
+    } else if (fragmentTypeSelect.value.startsWith('image/')) {
+      imageFragment.hidden = false;
+      imageFragment.required = true;
     }
   };
 
-  // =============================================
+  /////// handles POST /v1/fragments //////////////////
+  createFragmentForm.onsubmit = async (evt) => {
+    evt.preventDefault();
 
-  // GET /v1/fragments/:id
-  getFragmentDataByIdForm.onsubmit = (evt) => {
+    // retrieve form data and pass it to create fragment handler
+    const formData = new FormData(createFragmentForm);
+    const res = await handlePostFragment(user, formData);
+
+    // remove existing error notification
+    if (createFragmentError) {
+      createFragmentError.innerHTML = '';
+      createFragmentError.hidden = true;
+    }
+
+    // if an error occurred
+    if (res === 'Failed to create a new fragment') {
+      const p = document.createElement('p');
+      p.textContent = res;
+      p.style.color = 'red';
+      createFragmentError.appendChild(p);
+      createFragmentError.hidden = false;
+    }
+    // if no error
+    else {
+      await handleListFragments(user);
+
+      textFragment.hidden = true;
+      textFragment.required = false;
+      jsonFragment.hidden = true;
+      jsonFragment.required = false;
+      imageFragment.hidden = true;
+      imageFragment.required = false;
+
+      createFragmentForm.reset();
+    }
+  };
+
+  /////// handles GET /v1/fragments/:id //////////////////
+  viewFragmentForm.onsubmit = async (evt) => {
     evt.preventDefault();
 
     // retrieve form data
-    const formData = new FormData(getFragmentDataByIdForm);
+    const formData = new FormData(viewFragmentForm);
     const fragmentId = formData.get('fragment-id');
 
-    // request
-    getFragmentDataById(user, fragmentId);
+    if (getFragmentError) {
+      getFragmentError.innerHTML = '';
+      getFragmentError.hidden = true;
+    }
 
-    // clean up form
-    getFragmentDataByIdForm.reset();
-  };
+    // handle view fragment
+    try {
+      const { data, fragmentType } = await viewFragment(user, fragmentId);
 
-  // =============================================
-  // =============================================
+      const pre = document.createElement('pre');
 
-  fragmentTypeSelection.onchange = () => {
-    // set everything to default
-    textFragmentInput.hidden = true;
-    textFragmentInput.required = false;
+      if (fragmentType.startsWith('image/')) {
+        const img = document.createElement('img');
+        img.src = data;
+        pre.appendChild(img);
+      } else {
+        pre.textContent = fragmentType.startsWith('text/') ? data : JSON.stringify(data, null, 2);
+      }
 
-    htmlFragmentInput.hidden = true;
-    htmlFragmentInput.required = false;
+      document.body.appendChild(pre);
 
-    markdownFragmentInput.hidden = true;
-    markdownFragmentInput.required = false;
-
-    jsonFragmentInput.hidden = true;
-    jsonFragmentInput.required = false;
-
-    if (fragmentTypeSelection.value == 'text/plain') {
-      textFragmentInput.hidden = false;
-      textFragmentInput.required = true;
-    } else if (fragmentTypeSelection.value == 'text/markdown') {
-      markdownFragmentInput.hidden = false;
-      markdownFragmentInput.required = true;
-    } else if (fragmentTypeSelection.value == 'text/html') {
-      htmlFragmentInput.hidden = false;
-      htmlFragmentInput.required = true;
-    } else if (fragmentTypeSelection.value == 'application/json') {
-      jsonFragmentInput.hidden = false;
-      jsonFragmentInput.required = true;
+      viewFragmentForm.reset();
+    } catch (err) {
+      const p = document.createElement('p');
+      p.textContent = err;
+      p.style.color = 'red';
+      getFragmentError.appendChild(p);
+      getFragmentError.hidden = false;
     }
   };
-
-  // Log user info for debugging purposes
-  console.log({ user });
-
-  // Update the UI to welcome the user
-  userSection.hidden = false;
-  contentSection.hidden = false;
-
-  // Show the user's username
-  userSection.querySelector('.username').innerText = user.username;
-
-  // Disable the Login button
-  loginBtn.disabled = true;
-
-  // Do an authenticated request to the fragments API server and log the result
-  listUserFragments(user);
 }
 
 // Wait for the DOM to be ready, then start the app

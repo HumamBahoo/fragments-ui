@@ -1,11 +1,11 @@
 body {
-  margin-bottom: 50px;
+  width: 100vw;
+  margin: 0;
+  padding: 0 50px;
 }
 
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+form > * {
+  margin-bottom: 20px;
 }
 
 h2 {
@@ -36,11 +36,67 @@ textarea {
   border-radius: 5px;
 }
 
-p {
-  margin-bottom: 0;
+select,
+input {
+  line-height: normal;
 }
 
-ul,
-li {
-  margin: 0;
+#content {
+  width: 90vw;
+}
+
+#forms-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: start;
+  gap: 20px;
+  align-items: stretch;
+  margin: 20px 0;
+}
+
+#create-fragment-form {
+  border: 1px solid slategray;
+  border-radius: 10px;
+  padding: 0 20px;
+  flex: 1;
+}
+
+#view-fragment-form {
+  border: 1px solid slategray;
+  border-radius: 10px;
+  padding: 0 20px;
+  flex: 1;
+}
+
+#views-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: start;
+  gap: 20px;
+  align-items: stretch;
+  margin: 20px 0;
+}
+
+#user-fragments-table {
+  border: 1px solid slategray;
+  border-radius: 10px;
+  padding: 0 20px;
+  flex: 2;
+}
+
+#fragment-view-container {
+  border: 1px solid slategray;
+  border-radius: 10px;
+  padding: 0 20px;
+  padding-bottom: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.note {
+  color: gold;
+  padding: 0 30px;
 }
